@@ -1,6 +1,10 @@
 # **COP4521-TradingBot**
 
 ## **Project Plan** 
-* Backtrader used as main Framework to run trading bot
-* Import Datafeeds into the cerebro instance via pandas dataframes. These will be generated from a database (sqlite/mysql).
+* Alpaca Broker API to buy and sell
+* Alpaca Market Data API to backtest, or live paper trading.
+* GUI using Qt library
+### Database Schema
+* 
+
 

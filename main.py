@@ -1,17 +1,14 @@
-#This is a simple example given by backtrader docs
+from PySide6 import QtWidgets
+import sys
 
-from __future__ import (absolute_import, division, print_function,
-                        unicode_literals)
+from GuiWidgets.AppWidget import AppWidget
 
-import backtrader as bt
 
-if __name__ == '__main__':
-    cerebro = bt.Cerebro()
-    cerebro.broker.setcash(100000.0)
+if __name__ == "__main__":
+    app = QtWidgets.QApplication([])
 
-    print('Starting Portfolio Value: %.2f' % cerebro.broker.getvalue())
+    mainPage = AppWidget()
+    mainPage.resize(1280,720)
+    mainPage.show()
 
-    cerebro.run()
-
-    print('Final Portfolio Value: %.2f' % cerebro.broker.getvalue())
-
+    sys.exit(app.exec())
