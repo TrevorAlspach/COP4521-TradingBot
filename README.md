@@ -6,5 +6,3 @@
 * GUI using Qt library
 ### Database Schema
 * 
-
-
