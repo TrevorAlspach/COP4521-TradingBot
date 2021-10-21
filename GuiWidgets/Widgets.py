@@ -2,6 +2,12 @@ from PySide6 import QtWidgets
 from PySide6 import QtCore
 from PySide6.QtGui import QFont
 
+class Window(QtWidgets.QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+
+
 class AppWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
