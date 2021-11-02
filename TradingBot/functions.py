@@ -1,8 +1,9 @@
 import json, requests
-from config import *
+from TradingBot.config import *
+
 
 BASE_URL = "https://paper-api.alpaca.markets"
-HEADERS = {'APCA-API-KEY-ID': API_KEY, 'APCA-API-SECRET-KEY': SECRETE_KEY}
+HEADERS = {'APCA-API-KEY-ID': API_KEY, 'APCA-API-SECRET-KEY': SECRET_KEY}
 ACCOUNT_URL = "{}/v2/account".format(BASE_URL)
 ORDERS_URL = "{}/v2/orders".format(BASE_URL)
 
@@ -23,4 +24,7 @@ def create_order(symbol, qty, side, type, time_in_force):
     r = requests.post(ORDERS_URL,json=data, headers = HEADERS)
 
     return json.loads(r.content)
+
+
+
 
