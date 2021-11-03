@@ -6,7 +6,7 @@ BASE_URL = "https://paper-api.alpaca.markets"
 HEADERS = {'APCA-API-KEY-ID': API_KEY, 'APCA-API-SECRET-KEY': SECRET_KEY}
 ACCOUNT_URL = "{}/v2/account".format(BASE_URL)
 ORDERS_URL = "{}/v2/orders".format(BASE_URL)
-
+POSITIONS_URL = "{}/v2/positions".format(BASE_URL)
 
 def get_account():
     r = requests.get(ACCOUNT_URL, headers=HEADERS)
