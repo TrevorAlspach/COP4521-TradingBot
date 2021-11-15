@@ -39,6 +39,7 @@ def runSMA(symbols, smallSMASize, largeSMASize):
             print("LargeSMA > smallSMA")
 
     def runSomeOtherStrat(symbols):
+        pass
 
 
 
