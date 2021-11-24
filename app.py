@@ -11,5 +11,6 @@ if __name__ == "__main__":
     window.resize(1280,720)
     window.show()
     Bot.runSMA(("AAPL", "MSFT"), 20, 50)
+    Bot.volumePrice(("AAPL", "MSFT"), 30)
 
     sys.exit(app.exec())
