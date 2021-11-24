@@ -30,36 +30,43 @@ def runSMA(symbols, smallSMASize, largeSMASize):
             print("smallSMA > largeSMA")
             try:
                 api.get_position(symbol)
-            
+
             except(APIError):
                 print("There is no current postion. (BUY!)")
                 #api.submit_order(symbol, )
-        
+
         else:
             print("LargeSMA > smallSMA")
 
-    def runSomeOtherStrat(symbols):
+def volumePrice(symbols, volumeSize):
+    if account.status != "ACTIVE":
+        logging.error("Alpaca Account is not able to trade")
+        return False
+
+    symbolsToTrade = symbols
+
+    currentDate = datetime.today().date() - timedelta(days=1)
+    startDate = currentDate - timedelta(days=100)
 
 
+    for symbol in symbolsToTrade:
+        bars = api.get_bars(symbol, TimeFrame.Day, start=startDate, end=currentDate, limit=100).df
 
+        avgVol = bars.volume.mean()
+        currentVol = bars.volume[-1]
+        priceChange = bars.close[-1] - bars.close[-6]
+        print(api.list_positions())
+        print("Ticker: {} \nAvg Vol: {} \nPrice Change last 5 Days: {} \nTime Frame: {} to {}".format(symbol, avgVol, priceChange, startDate, currentDate)) # testing can delete
+        if(currentVol > avgVol and priceChange > 0):
 
-        
-        
+            print("currentVol > avgVol and price is up")
+            try:
+                api.get_position(symbol)
 
+            except(APIError):
+                print("There is no current position. (BUY!)")
+                #api.submit_order(symbol, )
+                # need to push trade to database
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        else:
+            print("avgVol > currentVol or price is down")
