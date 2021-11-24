@@ -38,31 +38,10 @@ def runSMA(symbols, smallSMASize, largeSMASize):
         else:
             print("LargeSMA > smallSMA")
 
-<<<<<<< HEAD
 def volumePrice(symbols, volumeSize):
     if account.status != "ACTIVE":
         logging.error("Alpaca Account is not able to trade")
         return False
-=======
-    def runSomeOtherStrat(symbols):
-        pass
-
-
-
-
-        
-        
-
-
-
-
-
-
-
-
-
-
->>>>>>> 283b6d938dc492346dd74eddde903de9141393a1
 
     symbolsToTrade = symbols
 
