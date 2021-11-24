@@ -38,7 +38,7 @@ def runSMA(symbols, smallSMASize, largeSMASize):
         else:
             print("LargeSMA > smallSMA")
 
-def volumePrice(symbols, volumeSize):
+def volumePrice(symbols, timeFrame):
     if account.status != "ACTIVE":
         logging.error("Alpaca Account is not able to trade")
         return False
@@ -46,17 +46,17 @@ def volumePrice(symbols, volumeSize):
     symbolsToTrade = symbols
 
     currentDate = datetime.today().date() - timedelta(days=1)
-    startDate = currentDate - timedelta(days=100)
+    startDate = currentDate - timedelta(days=timeFrame)
 
 
     for symbol in symbolsToTrade:
-        bars = api.get_bars(symbol, TimeFrame.Day, start=startDate, end=currentDate, limit=100).df
+        bars = api.get_bars(symbol, TimeFrame.Day, start=startDate, end=currentDate, limit=timeFrame).df
 
-        avgVol = bars.volume.mean()
+        avgVol = bars.volume.mean()                     # gets average volume last specified days (timeFrame)
         currentVol = bars.volume[-1]
-        priceChange = bars.close[-1] - bars.close[-6]
+        priceChange = bars.close[-1] - bars.close[-6]   # gets price change last 5 days
         print(api.list_positions())
-        print("Ticker: {} \nAvg Vol: {} \nPrice Change last 5 Days: {} \nTime Frame: {} to {}".format(symbol, avgVol, priceChange, startDate, currentDate)) # testing can delete
+        print("Ticker: {} \nTime Frame: {}\nAvg Vol: {} \nPrice Change last 5 Days: {} \nTime Frame: {} to {}".format(symbol, timeFrame, avgVol, priceChange, startDate, currentDate)) # testing can delete
         if(currentVol > avgVol and priceChange > 0):
 
             print("currentVol > avgVol and price is up")
@@ -66,7 +66,6 @@ def volumePrice(symbols, volumeSize):
             except(APIError):
                 print("There is no current position. (BUY!)")
                 #api.submit_order(symbol, )
-                # need to push trade to database
 
         else:
             print("avgVol > currentVol or price is down")
