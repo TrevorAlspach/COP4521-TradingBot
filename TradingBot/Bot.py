@@ -69,3 +69,49 @@ def volumePrice(symbols, timeFrame):
 
         else:
             print("avgVol > currentVol or price is down")
+
+
+
+def runEMA(symbols, timeSpan):
+    if account.status != "ACTIVE":
+        logging.error("Alpaca Account is not able to trade")
+        return False
+
+    symbolsToTrade = symbols
+
+    currentDate = datetime.today().date() - timedelta(days=1)
+    startDate = currentDate - timedelta(days=timeSpan)
+
+    for symbol in symbolsToTrade:
+        bars = api.get_bars(symbol, TimeFrame.Day, start=startDate, end=currentDate).df
+
+        length = len(bars)              #gets amount of open days in time frame
+        priceList = []
+
+        for x in range(0, length):      #stores closing price in list
+            priceList.append(bars.close[x])
+
+        emaOfPrice = emaCalculation(priceList,length)   #store ema prices inside of a list
+        print("EMA of", symbol, ":", emaOfPrice)
+
+
+def emaCalculation(price_list,days):
+
+    ema = [sum(price_list) / days] #first obersvation is the sma of the closing prices
+
+    for price in price_list[1:]:   #perform EMA calculation using prices
+        ema.append((price * (2 / (1 + days))) + ema[-1] * (1 - (2 / (1 + days))))
+
+    return ema[days-1] #return final EMA
+
+
+
+
+
+
+
+
+
+
+
+
