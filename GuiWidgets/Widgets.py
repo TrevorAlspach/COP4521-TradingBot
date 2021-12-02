@@ -2,6 +2,8 @@ from PySide6 import QtWidgets, QtCharts
 from PySide6.QtWidgets import *
 from PySide6 import QtCore
 from PySide6.QtGui import QFont
+from pandas.core import frame
+#import TradingBot.Bot as bot
 
 class Window(QMainWindow):
     def __init__(self):
@@ -21,12 +23,12 @@ class Window(QMainWindow):
     def setupButtons(self):
         buttonLayout = QVBoxLayout()
 
-        button1 = QPushButton("View Graph")
-        button1.clicked.connect(self.view_graph)
-        button2 = QPushButton("View Bot History")
-        button2.clicked.connect(self.view_bot_history)
-        button3 = QPushButton("Three")
-        button2.clicked.connect(self.view_bot_history)
+        button1 = QPushButton("Main Menu")
+        button1.clicked.connect(self.view_main_menu)
+        button2 = QPushButton("View Graph")
+        button2.clicked.connect(self.view_graph)
+        button3 = QPushButton("View Bot History")
+        button3.clicked.connect(self.view_bot_history)
         buttonLayout.addWidget(button1)
         buttonLayout.addWidget(button2)
         buttonLayout.addWidget(button3)
@@ -35,6 +37,12 @@ class Window(QMainWindow):
         frame.setFrameStyle(QFrame.Raised | QFrame.Panel)
 
         return frame
+
+    def view_main_menu(self):
+         self.setCentralWidget(self.setupMainWidget(MainMenu()))
+
+    def view_bot_history(self):
+        self.setCentralWidget(self.setupMainWidget(BotHistory()))
 
     def view_graph(self):
         self.setCentralWidget(self.setupMainWidget(self.generate_graph()))
@@ -53,33 +61,47 @@ class Window(QMainWindow):
         chartView = QtCharts.QChartView(chart)
         return chartView
 
-    def view_bot_history(self):
-        self.setCentralWidget(self.setupMainWidget(BotHistory()))
-
-
 class MainMenu(QWidget):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
 
         main_label = QLabel()
-        second_label = QLabel()
         main_label.setAlignment(QtCore.Qt.AlignHCenter)
-        second_label.setAlignment(QtCore.Qt.AlignHCenter)
         main_label.setText("Welcome to the Bot!!")
-        second_label.setText("Click a button to do something")
+
+        bot_options = QListWidget()
+        bot_options.addItems(["SMA", "EMA", "Volume"])
+        bot_options.setFixedSize(QtCore.QSize(300, 100))
+
+        bot_symbols = QListWidget()
+        bot_symbols.addItems(["MSFT", "AAPL", "TSLA"])
+        bot_symbols.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        bot_symbols.setFixedSize(QtCore.QSize(300, 100))
+
+        list_frame = QFrame()
+        frame_layout = QHBoxLayout()
+        frame_layout.addWidget(bot_options)
+        frame_layout.addWidget(bot_symbols)
+        list_frame.setLayout(frame_layout)
 
         main_button_frame = QFrame()
         buttonLayout = QHBoxLayout()
-        buttonLayout.addWidget(QPushButton("START"))
-        buttonLayout.addWidget(QPushButton("STOP"))
+
+        start_button = QPushButton("START")
+        start_button.clicked.connect(self.start_bot)
+        stop_button = QPushButton("STOP")
+        buttonLayout.addWidget(start_button)
+        buttonLayout.addWidget(stop_button)
         main_button_frame.setLayout(buttonLayout)
 
-
         layout.addWidget(main_label)
-        layout.addWidget(second_label)
+        layout.addWidget(list_frame)
         layout.addWidget(main_button_frame)
         self.setLayout(layout)
+
+    def start_bot(self):
+        bot
         
 class BotHistory(QWidget):
     def __init__(self):
