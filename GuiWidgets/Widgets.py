@@ -3,8 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6 import QtCore
 from PySide6.QtGui import QFont
 from pandas.core import frame
-import TradingBot.Bot as bot
-
+from TradingBot.Bot import runEMA, runSMA, volumePrice
 
 class Window(QMainWindow):
     def __init__(self):
@@ -90,10 +89,13 @@ class MainMenu(QWidget):
         self.main_button_frame = QFrame()
         self.buttonLayout = QHBoxLayout()
 
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.whichStrategy)
+
         self.start_button = QPushButton("START")
         self.start_button.clicked.connect(self.start_bot)
         self.stop_button = QPushButton("STOP")
-        self.start_button.clicked.connect(self.stop_bot)
+        self.stop_button.clicked.connect(self.stop_bot)
 
         self.buttonLayout.addWidget(self.start_button)
         self.buttonLayout.addWidget(self.stop_button)
@@ -104,29 +106,30 @@ class MainMenu(QWidget):
         self.layout.addWidget(self.main_button_frame)
         self.setLayout(self.layout)
 
+    def stop_bot(self):
+        print("ARE WE STOPPING")
+        self.timer.stop()
+        self.start_button.setEnabled(True)
+        # Put bot history into database
+
     def start_bot(self):
-        strats = []
         for x in self.bot_options.selectedItems():
             print("result", x.text())
 
-        strats = [x.text() for x in self.bot_options.selectedItems()]
-        symbols = [x.text() for x in self.bot_symbols.selectedItems()]
+        self.strat = self.bot_options.selectedItems()[-1].text()
+        self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
 
-        for strat in strats:
-            if(strat == "EMA"):
-                bot.runEMA(tuple(symbols), 30)
-            elif(strat == "SMA"):
-                bot.runSMA(tuple(symbols), 20, 50)
-            elif(strat == "Volume"):
-                bot.volumePrice(tuple(symbols), 30)
-
+        self.timer.start(50)
         self.start_button.setEnabled(False)
 
-    def stop_bot(self):
-        # Stop the Bot
-        self.start_button.setEnabled(False)
-        # Put bot history into database
 
+    def whichStrategy(self):
+            if(self.strat == "EMA"):
+                runEMA(tuple(self.symbols), 30)
+            elif(self.strat == "SMA"):
+                runSMA(tuple(self.symbols), 20, 50)
+            elif(self.strat == "Volume"):
+                volumePrice(tuple(self.symbols), 30)
 
 class BotHistory(QWidget):
     def __init__(self):
