@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 import alpaca_trade_api as alpacaAPI
 from alpaca_trade_api.rest import APIError, TimeFrame
 from TradingBot.config import *
+import db.dbFunctions as db
 import logging
 import sqlite3 as sql
 
@@ -85,6 +86,17 @@ def volumePrice(symbols, timeFrame):
         else:
             print("avgVol > currentVol or price is down")
 
+        with sql.connect("botData.db") as con:
+            cur = con.cursor()
+            cur.execute('DELETE FROM Analysis')  ##delete old values
+
+            for x in range(0, len(bars.volume)):
+                cur.execute("REPLACE INTO Analysis(Symbol, Date, Price) VALUES (?,?,?)",
+                            (symbol, (bars.index[x].to_pydatetime()).date(), float(bars.volume[x])))  # update with new values
+        #print(bars.volume[0])
+        print(cur.execute('SELECT * FROM Analysis').fetchall())
+
+#31656467
 
 def runEMA(symbols, timeSpan):
     if account.status != "ACTIVE":
@@ -110,6 +122,7 @@ def runEMA(symbols, timeSpan):
 
         emaOfPrice = emaCalculation(priceList, length)  # store ema prices inside of a list
 
+        '''
         if float(todaysPrice) > float(emaOfPrice[length - 1]) and float(yesterdaysPrice) > float(
                 emaOfPrice[length - 2]):
             api.submit_order(symbol, 5)
@@ -118,14 +131,14 @@ def runEMA(symbols, timeSpan):
             api.submit_order(symbol, 5, "sell")
         else:
             pass
-
+        '''
         with sql.connect("botData.db") as con:
             cur = con.cursor()
-            for x in range(0, len(emaOfPrice)):
-                cur.execute("INSERT INTO Analysis(Symbol, Date, Price) VALUES (?,?,?)",
-                            (symbol, (bars.index[x].to_pydatetime()).date(), emaOfPrice[x]))
+            cur.execute('DELETE FROM Analysis')             ##delete old values
 
-        print(cur.execute('SELECT * FROM Analysis').fetchall())
+            for x in range(0, len(emaOfPrice)):
+                cur.execute("REPLACE INTO Analysis(Symbol, Date, Price) VALUES (?,?,?)",
+                            (symbol, (bars.index[x].to_pydatetime()).date(), emaOfPrice[x]))  #update with new values
 
 
 def emaCalculation(price_list, days):
@@ -141,3 +154,7 @@ def setQuantity(qt):
     global QUANTITY
     QUANTITY = qt
     print(f"New Quantity: {QUANTITY}")
+
+def getCurrentBalance():
+    account = api.get_account()
+    return account.portfolio_value

@@ -16,3 +16,14 @@ def getBotHistory():
     with sqlite3.connect('botData.db') as db:
         db.execute()
 
+def getAnalysisDates():
+    with sqlite3.connect('botData.db') as db:
+        curr = db.cursor()
+        Dates = curr.execute('SELECT Date FROM Analysis LIMIT 0, 30').fetchall()
+        return Dates
+
+def getAnaltsisValues():
+    with sqlite3.connect('botData.db') as db:
+        curr = db.cursor()
+        Values = curr.execute('SELECT Price FROM Analysis LIMIT 0, 30').fetchall()
+        return Values
