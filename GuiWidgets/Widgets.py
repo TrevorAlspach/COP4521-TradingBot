@@ -243,7 +243,7 @@ class BotHistory(QWidget):
         self.bot_history = db.getBotHistory()
         self.item_titles = []
         for item in self.bot_history:
-            self.item_titles.append("|   STRATEGY:     " + item[0] + "   |   START:     " + datetime.item[1] + "  |   END:     " + item[2] + "  |   PROFIT:    $" + str(item[5]) + "  |  ")
+            self.item_titles.append("|   STRATEGY:     " + item[0] + "   |   START:     " + item[1] + "  |   END:     " + item[2] + "  |   PROFIT:    $" + str(item[5]) + "  |  ")
 
         return self.item_titles
 
