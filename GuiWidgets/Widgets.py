@@ -101,7 +101,7 @@ class MainMenu(QWidget):
         self.setLayout(layout)
 
     def start_bot(self):
-        bot
+        pass
         
 class BotHistory(QWidget):
     def __init__(self):
