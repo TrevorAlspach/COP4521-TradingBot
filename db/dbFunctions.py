@@ -5,9 +5,9 @@ def setUpDatabase():
 
     conn.execute('CREATE TABLE IF NOT EXISTS Account (Username TEXT(40), Status TEXT(40), Cash TEXT(40), PortfolioValue TEXT(40))')
 
-    conn.execute('CREATE TABLE IF NOT EXISTS Portfolio (Symbol TEXT(4), Date TIMESTAMP, Quantity INT, Price FLOAT, BuySell TEXT(4))')
+    conn.execute('CREATE TABLE IF NOT EXISTS Portfolio (Symbol TEXT(4), Date DATETIME, Quantity INT, Price FLOAT, BuySell TEXT(4))')
 
-    conn.execute('CREATE TABLE IF NOT EXISTS EMA(Symbol TEXT(4), Date TEXT, Price FLOAT)')
+    conn.execute('CREATE TABLE IF NOT EXISTS Analysis(Symbol TEXT(4), Date TEXT, Price FLOAT)')
 
     conn.commit()
     conn.close()

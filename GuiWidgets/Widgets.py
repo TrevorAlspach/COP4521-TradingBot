@@ -49,11 +49,11 @@ class Window(QMainWindow):
 
     def generate_graph(points=None):
         series = QtCharts.QLineSeries()
-        series.append(1, 1)
-        series.append(2, 2)
-        series.append(3, 3)
-        series.append(4, 4)
-        series.append(5, 5)
+        series.append(1, 364)
+        series.append(2, 356)
+        series.append(3, 356.3)
+        series.append(4, 365.98)
+        series.append(5, 360.5)
         chart = QtCharts.QChart()
         chart.addSeries(series)
         chart.createDefaultAxes()
