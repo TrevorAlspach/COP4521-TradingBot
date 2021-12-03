@@ -5,6 +5,7 @@ from PySide6.QtGui import QFont
 from pandas.core import frame
 import TradingBot.Bot as bot
 
+
 class Window(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -39,7 +40,7 @@ class Window(QMainWindow):
         return frame
 
     def view_main_menu(self):
-         self.setCentralWidget(self.setupMainWidget(MainMenu()))
+        self.setCentralWidget(self.setupMainWidget(MainMenu()))
 
     def view_bot_history(self):
         self.setCentralWidget(self.setupMainWidget(BotHistory()))
@@ -47,19 +48,20 @@ class Window(QMainWindow):
     def view_graph(self):
         self.setCentralWidget(self.setupMainWidget(self.generate_graph()))
 
-    def generate_graph(points = None):
+    def generate_graph(points=None):
         series = QtCharts.QLineSeries()
-        series.append(1,1)
-        series.append(2,2)
-        series.append(3,3)
-        series.append(4,4)
-        series.append(5,5)
+        series.append(1, 1)
+        series.append(2, 2)
+        series.append(3, 3)
+        series.append(4, 4)
+        series.append(5, 5)
         chart = QtCharts.QChart()
         chart.addSeries(series)
         chart.createDefaultAxes()
         chart.setTitle("Example")
         chartView = QtCharts.QChartView(chart)
         return chartView
+
 
 class MainMenu(QWidget):
     def __init__(self):
@@ -105,18 +107,18 @@ class MainMenu(QWidget):
     def start_bot(self):
         bot.runSMA(("AAPL", "MSFT"), 20, 50)
         self.start_button.setEnabled(False)
-    
-    def stop_bot(self):
-        #Stop the Bot
-        self.start_button.setEnabled(False)
-        #Put bot history into database
 
-        
+    def stop_bot(self):
+        # Stop the Bot
+        self.start_button.setEnabled(False)
+        # Put bot history into database
+
+
 class BotHistory(QWidget):
     def __init__(self):
         super().__init__()
         layout = QVBoxLayout()
-        
+
         main_label = QLabel()
         list_view = QListView()
         main_label.setAlignment(QtCore.Qt.AlignHCenter)
@@ -127,7 +129,6 @@ class BotHistory(QWidget):
         main_button_frame = QFrame()
         buttonLayout = QHBoxLayout()
         main_button_frame.setLayout(buttonLayout)
-
 
         layout.addWidget(main_label)
         layout.addWidget(list_view)
