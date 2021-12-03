@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6 import QtCore
 from PySide6.QtGui import QFont
 from pandas.core import frame
-#import TradingBot.Bot as bot
+import TradingBot.Bot as bot
 
 class Window(QMainWindow):
     def __init__(self):
@@ -64,44 +64,53 @@ class Window(QMainWindow):
 class MainMenu(QWidget):
     def __init__(self):
         super().__init__()
-        layout = QVBoxLayout()
+        self.layout = QVBoxLayout()
 
-        main_label = QLabel()
-        main_label.setAlignment(QtCore.Qt.AlignHCenter)
-        main_label.setText("Welcome to the Bot!!")
+        self.main_label = QLabel()
+        self.main_label.setAlignment(QtCore.Qt.AlignHCenter)
+        self.main_label.setText("Welcome to the Bot!!")
 
-        bot_options = QListWidget()
-        bot_options.addItems(["SMA", "EMA", "Volume"])
-        bot_options.setFixedSize(QtCore.QSize(300, 100))
+        self.bot_options = QListWidget()
+        self.bot_options.addItems(["SMA", "EMA", "Volume"])
+        self.bot_options.setFixedSize(QtCore.QSize(300, 100))
 
         bot_symbols = QListWidget()
         bot_symbols.addItems(["MSFT", "AAPL", "TSLA"])
         bot_symbols.setSelectionMode(QAbstractItemView.ExtendedSelection)
         bot_symbols.setFixedSize(QtCore.QSize(300, 100))
 
-        list_frame = QFrame()
-        frame_layout = QHBoxLayout()
-        frame_layout.addWidget(bot_options)
-        frame_layout.addWidget(bot_symbols)
-        list_frame.setLayout(frame_layout)
+        self.list_frame = QFrame()
+        self.frame_layout = QHBoxLayout()
+        self.frame_layout.addWidget(self.bot_options)
+        self.frame_layout.addWidget(bot_symbols)
+        self.list_frame.setLayout(self.frame_layout)
 
-        main_button_frame = QFrame()
-        buttonLayout = QHBoxLayout()
+        self.main_button_frame = QFrame()
+        self.buttonLayout = QHBoxLayout()
 
-        start_button = QPushButton("START")
-        start_button.clicked.connect(self.start_bot)
-        stop_button = QPushButton("STOP")
-        buttonLayout.addWidget(start_button)
-        buttonLayout.addWidget(stop_button)
-        main_button_frame.setLayout(buttonLayout)
+        self.start_button = QPushButton("START")
+        self.start_button.clicked.connect(self.start_bot)
+        self.stop_button = QPushButton("STOP")
+        self.start_button.clicked.connect(self.stop_bot)
 
-        layout.addWidget(main_label)
-        layout.addWidget(list_frame)
-        layout.addWidget(main_button_frame)
-        self.setLayout(layout)
+        self.buttonLayout.addWidget(self.start_button)
+        self.buttonLayout.addWidget(self.stop_button)
+        self.main_button_frame.setLayout(self.buttonLayout)
+
+        self.layout.addWidget(self.main_label)
+        self.layout.addWidget(self.list_frame)
+        self.layout.addWidget(self.main_button_frame)
+        self.setLayout(self.layout)
 
     def start_bot(self):
-        bot
+        bot.runSMA(("AAPL", "MSFT"), 20, 50)
+        self.start_button.setEnabled(False)
+    
+    def stop_bot(self):
+        #Stop the Bot
+        self.start_button.setEnabled(False)
+        #Put bot history into database
+
         
 class BotHistory(QWidget):
     def __init__(self):
