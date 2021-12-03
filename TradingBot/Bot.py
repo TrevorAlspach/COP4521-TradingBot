@@ -3,11 +3,14 @@ import alpaca_trade_api as alpacaAPI
 from alpaca_trade_api.rest import APIError, TimeFrame
 from TradingBot.config import *
 import logging
+import sqlite3 as sql
+
 
 BASE_URL = "https://paper-api.alpaca.markets"
 
 api = alpacaAPI.REST(API_KEY, SECRET_KEY, BASE_URL, api_version='v2')
 account = api.get_account()
+
 
 def runSMA(symbols, smallSMASize, largeSMASize):
     if account.status != "ACTIVE":
@@ -92,7 +95,12 @@ def runEMA(symbols, timeSpan):
             priceList.append(bars.close[x])
 
         emaOfPrice = emaCalculation(priceList,length)   #store ema prices inside of a list
-        print("EMA of", symbol, ":", emaOfPrice)
+
+        with sql.connect("botData.db") as con:
+            cur = con.cursor()
+            for x in range (0, len(emaOfPrice)):
+                cur.execute("INSERT INTO Analysis(Symbol, Date, Price) VALUES (?,?,?)", (symbol, str(bars.index[x]), emaOfPrice[x]))
+            print(cur.execute('SELECT * FROM Analysis').fetchall())
 
 
 def emaCalculation(price_list,days):
@@ -101,8 +109,9 @@ def emaCalculation(price_list,days):
 
     for price in price_list[1:]:   #perform EMA calculation using prices
         ema.append((price * (2 / (1 + days))) + ema[-1] * (1 - (2 / (1 + days))))
+        final_ema = my_formatted_list = [ '%.2f' % x for x in ema ]
 
-    return ema[days-1] #return final EMA
+    return final_ema
 
 
 

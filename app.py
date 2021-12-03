@@ -15,5 +15,5 @@ if __name__ == "__main__":
     window.show()
     #Bot.runSMA(("AAPL", "MSFT"), 20, 50)
     #Bot.volumePrice(("AAPL", "MSFT"), 30)
-    #Bot.runEMA(("AAPL", "MSFT"), 50)
+    Bot.runEMA(("AAPL", "MSFT"), 50)
     sys.exit(app.exec())
