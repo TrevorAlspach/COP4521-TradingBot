@@ -3,7 +3,7 @@ from PySide6.QtWidgets import *
 from PySide6 import QtCore
 from PySide6.QtGui import QFont
 from pandas.core import frame
-from TradingBot.Bot import runEMA, runSMA, volumePrice
+from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity
 
 class Window(QMainWindow):
     def __init__(self):
@@ -98,7 +98,7 @@ class MainMenu(QWidget):
 
 
         self.checkbox_frame = QFrame()
-        self.checkbox_label = QLabel(text= "Time Span (Days)") 
+        self.checkbox_label = QLabel(text= "Time Span (Days)")
         self.checkboxes = QButtonGroup()
         self.checkbox_layout = QVBoxLayout()
         self.checkbox_layout.setAlignment(QtCore.Qt.AlignHCenter)
@@ -132,9 +132,12 @@ class MainMenu(QWidget):
         self.start_button.clicked.connect(self.start_bot)
         self.stop_button = QPushButton("STOP BOT")
         self.stop_button.clicked.connect(self.stop_bot)
+        self.quantity_button = QPushButton("Set Quantity")
+        self.quantity_button.clicked.connect(self.set_quantity)
 
         self.buttonLayout.addWidget(self.start_button)
         self.buttonLayout.addWidget(self.stop_button)
+        self.buttonLayout.addWidget(self.quantity_button)
         self.main_button_frame.setLayout(self.buttonLayout)
 
         self.layout.addWidget(self.main_label)
@@ -150,6 +153,11 @@ class MainMenu(QWidget):
         for button in self.checkboxes.buttons():
             button.setEnabled(True)
         # Put bot history into database
+
+    def set_quantity(self):
+        num,ok = QInputDialog.getInt(self,"Quantity Dialog","Enter Quantity")
+        if ok:
+            setQuantity(num)
 
     def start_bot(self):
         for x in self.bot_options.selectedItems():
@@ -180,7 +188,7 @@ class MainMenu(QWidget):
                     runSMA(tuple(self.symbols), 20, 50)
                 elif self.timeframe == self.check_3:
                     runSMA(tuple(self.symbols), 50, 200)
-                
+
             elif(self.strat == "Volume"):
                 if self.timeframe == self.check_1:
                     volumePrice(tuple(self.symbols), 12)
