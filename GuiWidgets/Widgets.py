@@ -4,6 +4,7 @@ from PySide6 import QtCore
 from PySide6.QtGui import QFont
 from pandas.core import frame
 from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, setQuantity
+import db
 
 class Window(QMainWindow):
     def __init__(self):
@@ -167,13 +168,18 @@ class MainMenu(QWidget):
         num,ok = QInputDialog.getInt(self,"Quantity Dialog","Enter Quantity")
         if ok:
             setQuantity(num)
+        else:
+            setQuantity(5)
 
     def start_bot(self):
         for x in self.bot_options.selectedItems():
             print("result", x.text())
 
         self.timeframe = self.checkboxes.checkedButton()
-        self.strat = self.bot_options.selectedItems()[-1].text()
+        try:
+            self.strat = self.bot_options.selectedItems()[-1].text()
+        except:
+            print("No options selected")
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
 
         self.timer.start(21600000)
