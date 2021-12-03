@@ -49,10 +49,10 @@ class Window(QMainWindow):
 
     def generate_graph(self, points=None):
         dates = db.getAnalysisDates()
-        values = db.getAnaltsisValues()
-
+        values = db.getAnalysisValues()
 
         series = QtCharts.QLineSeries()
+
 
         if(len(dates)>=30):
             for x in range(0, 30):
@@ -60,6 +60,8 @@ class Window(QMainWindow):
         else:
             for x in range (0, len(dates)):
                 series.append(x, float((values[x][0])))
+
+
 
 
         chart = QtCharts.QChart()
@@ -193,8 +195,8 @@ class MainMenu(QWidget):
         except:
             print("No options selected")
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
-        
-        self.timer.start(21600000)
+
+        self.timer.start(3000)
         self.start_button.setEnabled(False)
         for button in self.checkboxes.buttons():
             button.setEnabled(False)

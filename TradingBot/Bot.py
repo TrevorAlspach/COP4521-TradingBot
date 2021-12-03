@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import alpaca_trade_api as alpacaAPI
+import numpy
 from alpaca_trade_api.rest import APIError, TimeFrame
 from TradingBot.config import *
 import db.dbFunctions as db
@@ -18,7 +19,6 @@ def runSMA(symbols, smallSMASize, largeSMASize):
     if account.status != "ACTIVE":
         logging.error("Alpaca Account is not able to trade")
         return False
-
     symbolsToTrade = symbols
 
     currentDate = datetime.today().date() - timedelta(
@@ -30,8 +30,18 @@ def runSMA(symbols, smallSMASize, largeSMASize):
 
         largeSMA = bars.close.rolling(largeSMASize).mean()[-1]
         smallSMA = bars.close.rolling(smallSMASize).mean()[-1]
-        print(api.list_positions())
+        largeSMA_list = []
+        smallSMA_list = []
 
+        for x in range(largeSMASize,len(bars)):
+            largeSMA_list.append(bars.close.rolling(largeSMASize).mean()[x])
+
+        for x in range(smallSMASize,len(bars)):
+            smallSMA_list.append(bars.close.rolling(smallSMASize).mean()[x])
+
+        print(api.list_positions())
+        print(largeSMA_list)
+        print(smallSMA_list)
         if smallSMA > largeSMA:
             print("smallSMA > largeSMA")
             try:
@@ -49,12 +59,21 @@ def runSMA(symbols, smallSMASize, largeSMASize):
         else:
             print("LargeSMA > smallSMA")
 
+    with sql.connect("botData.db") as con:
+        cur = con.cursor()
+        cur.execute('DELETE FROM Analysis')  ##delete old values
+
+        for x in range(largeSMASize, len(bars.volume)):
+            cur.execute("INSERT INTO SMAAnalysis(Symbol,Date,LargeSMA,SmallSMA) VALUES (?,?,?,?)",
+                        (symbol, (bars.index[x].to_pydatetime()).date(), float(bars.close.rolling(smallSMASize).mean()[x]), float(bars.close.rolling(smallSMASize).mean()[x])),)  # update with new values
+
+
 
 def volumePrice(symbols, timeFrame):
     if account.status != "ACTIVE":
         logging.error("Alpaca Account is not able to trade")
         return False
-
+    print("ran")
     symbolsToTrade = symbols
 
     currentDate = datetime.today().date() - timedelta(days=1)
@@ -95,15 +114,13 @@ def volumePrice(symbols, timeFrame):
 
         with sql.connect("botData.db") as con:
             cur = con.cursor()
-            cur.execute('DELETE FROM Analysis')  ##delete old values
+            cur.execute('DELETE FROM Analysis')
 
             for x in range(0, len(bars.volume)):
                 cur.execute("REPLACE INTO Analysis(Symbol, Date, Price) VALUES (?,?,?)",
                             (symbol, (bars.index[x].to_pydatetime()).date(), float(bars.volume[x])))  # update with new values
-        #print(bars.volume[0])
-        print(cur.execute('SELECT * FROM Analysis').fetchall())
 
-#31656467
+
 
 def runEMA(symbols, timeSpan):
     if account.status != "ACTIVE":
@@ -129,18 +146,17 @@ def runEMA(symbols, timeSpan):
 
         emaOfPrice = emaCalculation(priceList, length)  # store ema prices inside of a list
 
-        '''
         if float(todaysPrice) > float(emaOfPrice[length - 1]) and float(yesterdaysPrice) > float(
                 emaOfPrice[length - 2]):
-            api.submit_order(symbol, QUANTITY)
+            #api.submit_order(symbol, QUANTITY)
             print(f"BOT {QUANTITY} {symbol}")
         elif float(todaysPrice) < float(emaOfPrice[length - 1]) and float(yesterdaysPrice) < float(
                 emaOfPrice[length - 2]):
-            api.submit_order(symbol, QUANTITY, "sell")
+            #api.submit_order(symbol, QUANTITY, "sell")
             print(f"SOLD {QUANTITY} {symbol}")
         else:
             pass
-        '''
+
         with sql.connect("botData.db") as con:
             cur = con.cursor()
             cur.execute('DELETE FROM Analysis')             ##delete old values
