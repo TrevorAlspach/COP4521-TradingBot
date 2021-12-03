@@ -3,8 +3,9 @@ from PySide6.QtWidgets import *
 from PySide6 import QtCore
 from PySide6.QtGui import QFont
 from pandas.core import frame
-from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, setQuantity
-import db
+from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, setQuantity, getCurrentBalance
+import db.dbFunctions as db
+import datetime
 
 class Window(QMainWindow):
     def __init__(self):

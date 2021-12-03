@@ -9,12 +9,24 @@ def setUpDatabase():
 
     conn.execute('CREATE TABLE IF NOT EXISTS Analysis(Symbol TEXT(4), Date TEXT, Price FLOAT)')
 
+    conn.execute('CREATE TABLE IF NOT EXISTS BotHistory(Strategy TEXT(3), StartDate DATETIME, EndDate DATETIME, StartBalance FLOAT, EndBalance FLOAT, Profit FLOAT, CurrentBot INTEGER)')
+
     conn.commit()
     conn.close()
 
 def getBotHistory():
     with sqlite3.connect('botData.db') as db:
         db.execute()
+
+def startBotRun(strategy, start_date, start_balance):
+      with sqlite3.connect('botData.db') as db:
+          db.execute("INSERT INTO BotHistory(Strategy, StartDate, StartBalance, CurrentBot) VALUES (?,?,?,?)", (strategy, start_date, start_balance, 1))
+
+def stopBotRun(end_date, end_balance):
+    with sqlite3.connect('botData.db') as db:
+        start_balance = db.execute("SELECT StartBalance FROM BotHistory WHERE CurrentBot = 1").fetchone()[0]
+        profit = float(end_balance) - float(start_balance)
+        db.execute("UPDATE BotHistory SET (EndDate, EndBalance, Profit, CurrentBot) = (?,?,?,?) WHERE CurrentBot = 1", (end_date, end_balance, profit, 0))
 
 def getAnalysisDates():
     with sqlite3.connect('botData.db') as db:
