@@ -16,7 +16,11 @@ def setUpDatabase():
 
 def getBotHistory():
     with sqlite3.connect('botData.db') as db:
-        db.execute()
+        return db.execute("SELECT * FROM BotHistory").fetchall()
+    
+def clearBotHistory():
+     with sqlite3.connect('botData.db') as db:
+         db.execute("DELETE FROM BotHistory WHERE CurrentBot = 0")
 
 def startBotRun(strategy, start_date, start_balance):
       with sqlite3.connect('botData.db') as db:

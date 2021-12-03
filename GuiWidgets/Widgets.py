@@ -1,8 +1,6 @@
 from PySide6 import QtWidgets,QtCharts
 from PySide6.QtWidgets import *
 from PySide6 import QtCore
-from PySide6.QtGui import QFont
-from pandas.core import frame
 from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, setQuantity, getCurrentBalance
 import db.dbFunctions as db
 import datetime
@@ -214,20 +212,36 @@ class MainMenu(QWidget):
 class BotHistory(QWidget):
     def __init__(self):
         super().__init__()
-        layout = QVBoxLayout()
+        self.layout = QVBoxLayout()
 
-        main_label = QLabel()
-        list_view = QListView()
-        main_label.setAlignment(QtCore.Qt.AlignHCenter)
-        main_label.setText("Bot History Screen")
+        self.main_label = QLabel()
+        self.list_view = QListWidget()
+        self.list_view.setFixedSize(1000, 200)
+        self.main_label.setAlignment(QtCore.Qt.AlignHCenter)
+        self.main_label.setText("Bot History Screen")
 
-        clear_button = QPushButton()
+        self.clear_button = QPushButton("Clear Bot History")
+        self.clear_button.clicked.connect(self.clear_button_click)
 
-        main_button_frame = QFrame()
-        buttonLayout = QHBoxLayout()
-        main_button_frame.setLayout(buttonLayout)
+        self.list_view.addItems(self.populate_listview())
+        self.main_button_frame = QFrame()
+        self.buttonLayout = QHBoxLayout()
+        self.buttonLayout.addWidget(self.clear_button)
+        self.main_button_frame.setLayout(self.buttonLayout)
 
-        layout.addWidget(main_label)
-        layout.addWidget(list_view)
-        layout.addWidget(main_button_frame)
-        self.setLayout(layout)
+        self.layout.addWidget(self.main_label)
+        self.layout.addWidget(self.list_view)
+        self.layout.addWidget(self.main_button_frame)
+        self.setLayout(self.layout)
+
+    def populate_listview(self):
+        self.bot_history = db.getBotHistory()
+        self.item_titles = []
+        for item in self.bot_history:
+            self.item_titles.append("|   STRATEGY:     " + item[0] + "   |   START:     " + datetime.item[1] + "  |   END:     " + item[2] + "  |   PROFIT:    $" + str(item[5]) + "  |  ")
+
+        return self.item_titles
+
+    def clear_button_click(self):
+        db.clearBotHistory()
+        self.list_view.clear()
