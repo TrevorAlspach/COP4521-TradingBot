@@ -3,12 +3,14 @@
 ## **Project Description** 
 A python application that uses the Alpaca Data API and Orders API in order to trade in the background automatically. Using the Alpaca Data API we request present and historical market data, which the bot uses to make decisions on BUY/SELL orders using one of three strategies we implemented. The user has the option of which strategy they would like to run the bot with, what stock(s) they would like to trade, their buy/sell quantity, along with that strategy's specific time span parameter. Through the UI you can access previous iterations of the bot, as well as a graphical representation of your current iteration.
 
-**TO RUN THE APP**
+**TO RUN THE APP** <br />
 Within the COP4521-TradingBot Directory
 * Windows: 
+   * > py .\venv\Scripts\activate 
    * > pip install -r .\Utility\requirements.txt  
    * > py .\app.py
 * Linux: 
+   * 
    * $pip install -r Utility/requirements.txt
    * $python3 app.py
 
