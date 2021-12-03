@@ -10,6 +10,7 @@ BASE_URL = "https://paper-api.alpaca.markets"
 
 api = alpacaAPI.REST(API_KEY, SECRET_KEY, BASE_URL, api_version='v2')
 account = api.get_account()
+QUANTITY = 5
 
 
 def runSMA(symbols, smallSMASize, largeSMASize):
@@ -71,7 +72,16 @@ def volumePrice(symbols, timeFrame):
 
             except(APIError):
                 print("There is no current position. (BUY!)")
-                # api.submit_order(symbol, )
+
+                api.submit_order(
+                    symbol=symbol,
+                    side='buy',
+                    type='market',
+                    qty=str(QUANTITY),
+                    time_in_force='day',
+                    order_class='trailing_stop',
+                    trail_percent='5',
+                    )
 
         else:
             print("avgVol > currentVol or price is down")
@@ -140,7 +150,11 @@ def emaCalculation(price_list, days):
 
     return final_ema
 
+def setQuantity(qt):
+    global QUANTITY
+    QUANTITY = qt
+    print(f"New Quantity: {QUANTITY}")
+
 def getCurrentBalance():
     account = api.get_account()
     return account.portfolio_value
-    
