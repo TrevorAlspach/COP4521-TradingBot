@@ -1,9 +1,10 @@
+from sqlite3.dbapi2 import Date
 from PySide6 import QtWidgets, QtCharts
 from PySide6.QtWidgets import *
 from PySide6 import QtCore
-from PySide6.QtGui import QFont
-from pandas.core import frame
-from TradingBot.Bot import runEMA, runSMA, volumePrice
+from TradingBot.Bot import runEMA, runSMA, volumePrice, getCurrentBalance
+import db.dbFunctions as db
+import datetime
 
 class Window(QMainWindow):
     def __init__(self):
@@ -149,7 +150,8 @@ class MainMenu(QWidget):
         self.start_button.setEnabled(True)
         for button in self.checkboxes.buttons():
             button.setEnabled(True)
-        # Put bot history into database
+        
+        db.stopBotRun(datetime.datetime.now(), getCurrentBalance())
 
     def start_bot(self):
         for x in self.bot_options.selectedItems():
@@ -159,10 +161,12 @@ class MainMenu(QWidget):
         self.strat = self.bot_options.selectedItems()[-1].text()
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
 
-        self.timer.start(150)
+        self.timer.start(21600000)
         self.start_button.setEnabled(False)
         for button in self.checkboxes.buttons():
             button.setEnabled(False)
+
+        db.startBotRun(self.strat, datetime.datetime.now(), getCurrentBalance())
 
     def whichStrategy(self):
             if(self.strat == "EMA"):

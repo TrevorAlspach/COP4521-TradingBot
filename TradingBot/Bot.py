@@ -115,8 +115,6 @@ def runEMA(symbols, timeSpan):
                 cur.execute("INSERT INTO Analysis(Symbol, Date, Price) VALUES (?,?,?)",
                             (symbol, (bars.index[x].to_pydatetime()).date(), emaOfPrice[x]))
 
-        print(cur.execute('SELECT * FROM Analysis').fetchall())
-
 
 def emaCalculation(price_list, days):
     ema = [sum(price_list) / days]  # first obersvation is the sma of the closing prices
@@ -126,3 +124,8 @@ def emaCalculation(price_list, days):
         final_ema = my_formatted_list = ['%.2f' % x for x in ema]
 
     return final_ema
+
+def getCurrentBalance():
+    account = api.get_account()
+    return account.portfolio_value
+    
