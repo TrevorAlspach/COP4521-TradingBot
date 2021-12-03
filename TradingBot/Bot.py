@@ -33,13 +33,10 @@ def runSMA(symbols, smallSMASize, largeSMASize):
         print(api.list_positions())
 
         if smallSMA > largeSMA:
-            print("smallSMA > largeSMA")
             try:
                 api.get_position(symbol)
 
             except(APIError):
-                print("There is no current postion. (BUY!)")
-
                 api.submit_order(
                     symbol=symbol,
                     qty=str(QUANTITY),
@@ -68,8 +65,6 @@ def volumePrice(symbols, timeFrame):
         priceChange = bars.close[-1] - bars.close[-6]  # gets price change last 5 days
         print(api.list_positions())
         print(
-            "Ticker: {} \nTime Frame: {}\nAvg Vol: {} \nPrice Change last 5 Days: {} \nTime Frame: {} to {}".format(
-                symbol, timeFrame, avgVol, priceChange, startDate, currentDate))  # testing can delete
         if (currentVol > avgVol and priceChange > 0):
 
             print("currentVol > avgVol and price is up")

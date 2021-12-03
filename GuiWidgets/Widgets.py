@@ -193,7 +193,7 @@ class MainMenu(QWidget):
         except:
             print("No options selected")
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
-        
+
         self.timer.start(21600000)
         self.start_button.setEnabled(False)
         for button in self.checkboxes.buttons():
@@ -256,6 +256,10 @@ class BotHistory(QWidget):
         self.bot_history = db.getBotHistory()
         self.item_titles = []
         for item in self.bot_history:
+
+            #testing
+            print(item)
+            
             self.item_titles.append("|   STRATEGY:     " + item[0] + "   |   START:     " + item[1] + "  |   END:     " + item[2] + "  |   PROFIT:    $" + str(item[5]) + "  |  ")
 
         return self.item_titles
