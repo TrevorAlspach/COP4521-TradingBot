@@ -9,6 +9,8 @@ def setUpDatabase():
 
     conn.execute('CREATE TABLE IF NOT EXISTS Analysis(Symbol TEXT(4), Date TEXT, Price FLOAT)')
 
+    conn.execute('CREATE TABLE IF NOT EXISTS SMAAnalysis(Symbol TEXT(4), Date TEXT, LargeSMA FLOAT, SmallSMA FLOAT)')
+
     conn.execute('CREATE TABLE IF NOT EXISTS BotHistory(Strategy TEXT(3), StartDate DATETIME, EndDate DATETIME, StartBalance FLOAT, EndBalance FLOAT, Profit FLOAT, CurrentBot INTEGER)')
 
     conn.commit()
@@ -38,8 +40,9 @@ def getAnalysisDates():
         Dates = curr.execute('SELECT Date FROM Analysis LIMIT 0, 30').fetchall()
         return Dates
 
-def getAnaltsisValues():
+def getAnalysisValues():
     with sqlite3.connect('botData.db') as db:
         curr = db.cursor()
         Values = curr.execute('SELECT Price FROM Analysis LIMIT 0, 30').fetchall()
         return Values
+
