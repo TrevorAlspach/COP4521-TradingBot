@@ -71,19 +71,55 @@ class MainMenu(QWidget):
         self.main_label.setAlignment(QtCore.Qt.AlignHCenter)
         self.main_label.setText("Welcome to the Bot!!")
 
+        self.options_frame = QFrame()
+        self.options_layout = QVBoxLayout()
+        self.options_layout.addStretch()
         self.bot_options = QListWidget()
         self.bot_options.addItems(["SMA", "EMA", "Volume"])
         self.bot_options.setFixedSize(QtCore.QSize(300, 100))
+        self.strat_label = QLabel(text="Strategies")
+        self.options_layout.addWidget(self.strat_label)
+        self.options_layout.addWidget(self.bot_options)
+        self.options_layout.addStretch()
+        self.options_frame.setLayout(self.options_layout)
 
+        self.symbols_frame = QFrame()
+        self.symbols_layout = QVBoxLayout()
+        self.symbols_layout.addStretch()
         self.bot_symbols = QListWidget()
         self.bot_symbols.addItems(["MSFT", "AAPL", "TSLA"])
         self.bot_symbols.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.bot_symbols.setFixedSize(QtCore.QSize(300, 100))
+        self.symbols_label = QLabel(text="Symbols to Trade")
+        self.symbols_layout.addWidget(self.symbols_label)
+        self.symbols_layout.addWidget(self.bot_symbols)
+        self.symbols_layout.addStretch()
+        self.symbols_frame.setLayout(self.symbols_layout)
+
+
+        self.checkbox_frame = QFrame()
+        self.checkbox_label = QLabel(text= "Time Span (Days)") 
+        self.checkboxes = QButtonGroup()
+        self.checkbox_layout = QVBoxLayout()
+        self.checkbox_layout.setAlignment(QtCore.Qt.AlignHCenter)
+        self.check_1 = QRadioButton("SMA: 5, 20   EMA/Volume: 12")
+        self.check_2 = QRadioButton("SMA: 20, 50   EMA/Volume: 26")
+        self.check_3 = QRadioButton("SMA: 50, 200  EMA/Volume: 50")
+        self.checkboxes.addButton(self.check_1)
+        self.checkboxes.addButton(self.check_2)
+        self.checkboxes.addButton(self.check_3)
+        self.checkbox_layout.addWidget(self.checkbox_label)
+        self.checkbox_layout.addWidget(self.check_1)
+        self.checkbox_layout.addWidget(self.check_2)
+        self.checkbox_layout.addWidget(self.check_3)
+        self.checkbox_frame.setLayout(self.checkbox_layout)
 
         self.list_frame = QFrame()
         self.frame_layout = QHBoxLayout()
-        self.frame_layout.addWidget(self.bot_options)
-        self.frame_layout.addWidget(self.bot_symbols)
+        self.frame_layout.addStretch()
+        self.frame_layout.addWidget(self.options_frame)
+        self.frame_layout.addWidget(self.symbols_frame)
+        self.frame_layout.addStretch()
         self.list_frame.setLayout(self.frame_layout)
 
         self.main_button_frame = QFrame()
@@ -92,9 +128,9 @@ class MainMenu(QWidget):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.whichStrategy)
 
-        self.start_button = QPushButton("START")
+        self.start_button = QPushButton("START BOT")
         self.start_button.clicked.connect(self.start_bot)
-        self.stop_button = QPushButton("STOP")
+        self.stop_button = QPushButton("STOP BOT")
         self.stop_button.clicked.connect(self.stop_bot)
 
         self.buttonLayout.addWidget(self.start_button)
@@ -103,33 +139,56 @@ class MainMenu(QWidget):
 
         self.layout.addWidget(self.main_label)
         self.layout.addWidget(self.list_frame)
+        self.layout.addWidget(self.checkbox_frame)
         self.layout.addWidget(self.main_button_frame)
+        self.layout.addStretch()
         self.setLayout(self.layout)
 
     def stop_bot(self):
-        print("ARE WE STOPPING")
         self.timer.stop()
         self.start_button.setEnabled(True)
+        for button in self.checkboxes.buttons():
+            button.setEnabled(True)
         # Put bot history into database
 
     def start_bot(self):
         for x in self.bot_options.selectedItems():
             print("result", x.text())
 
+        self.timeframe = self.checkboxes.checkedButton()
         self.strat = self.bot_options.selectedItems()[-1].text()
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
 
-        self.timer.start(50)
+        self.timer.start(150)
         self.start_button.setEnabled(False)
-
+        for button in self.checkboxes.buttons():
+            button.setEnabled(False)
 
     def whichStrategy(self):
             if(self.strat == "EMA"):
-                runEMA(tuple(self.symbols), 30)
+                if self.timeframe == self.check_1:
+                    runEMA(tuple(self.symbols), 12)
+                if self.timeframe == self.check_2:
+                    runEMA(tuple(self.symbols), 26)
+                elif self.timeframe == self.check_3:
+                    runEMA(tuple(self.symbols), 50)
+
             elif(self.strat == "SMA"):
-                runSMA(tuple(self.symbols), 20, 50)
+                if self.timeframe == self.check_1:
+                    runSMA(tuple(self.symbols), 5, 20)
+                if self.timeframe == self.check_2:
+                    runSMA(tuple(self.symbols), 20, 50)
+                elif self.timeframe == self.check_3:
+                    runSMA(tuple(self.symbols), 50, 200)
+                
             elif(self.strat == "Volume"):
-                volumePrice(tuple(self.symbols), 30)
+                if self.timeframe == self.check_1:
+                    volumePrice(tuple(self.symbols), 12)
+                if self.timeframe == self.check_2:
+                    volumePrice(tuple(self.symbols), 26)
+                elif self.timeframe == self.check_3:
+                    volumePrice(tuple(self.symbols), 50)
+
 
 class BotHistory(QWidget):
     def __init__(self):
