@@ -1,5 +1,4 @@
-from sqlite3.dbapi2 import Date
-from PySide6 import QtWidgets, QtCharts
+from PySide6 import QtWidgets,QtCharts
 from PySide6.QtWidgets import *
 from PySide6 import QtCore
 from TradingBot.Bot import runEMA, runSMA, volumePrice, getCurrentBalance
@@ -48,13 +47,21 @@ class Window(QMainWindow):
     def view_graph(self):
         self.setCentralWidget(self.setupMainWidget(self.generate_graph()))
 
-    def generate_graph(points=None):
+    def generate_graph(self, points=None):
+        dates = db.getAnalysisDates()
+        values = db.getAnaltsisValues()
+
+
         series = QtCharts.QLineSeries()
-        series.append(1, 364)
-        series.append(2, 356)
-        series.append(3, 356.3)
-        series.append(4, 365.98)
-        series.append(5, 360.5)
+
+        if(len(dates)>=30):
+            for x in range(0, 30):
+                series.append(x, float((values[x][0])))
+        else:
+            for x in range (0, len(dates)):
+                series.append(x, float((values[x][0])))
+
+
         chart = QtCharts.QChart()
         chart.addSeries(series)
         chart.createDefaultAxes()
@@ -150,7 +157,7 @@ class MainMenu(QWidget):
         self.start_button.setEnabled(True)
         for button in self.checkboxes.buttons():
             button.setEnabled(True)
-        
+
         db.stopBotRun(datetime.datetime.now(), getCurrentBalance())
 
     def start_bot(self):
