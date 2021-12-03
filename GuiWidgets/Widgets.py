@@ -76,15 +76,15 @@ class MainMenu(QWidget):
         self.bot_options.addItems(["SMA", "EMA", "Volume"])
         self.bot_options.setFixedSize(QtCore.QSize(300, 100))
 
-        bot_symbols = QListWidget()
-        bot_symbols.addItems(["MSFT", "AAPL", "TSLA"])
-        bot_symbols.setSelectionMode(QAbstractItemView.ExtendedSelection)
-        bot_symbols.setFixedSize(QtCore.QSize(300, 100))
+        self.bot_symbols = QListWidget()
+        self.bot_symbols.addItems(["MSFT", "AAPL", "TSLA"])
+        self.bot_symbols.setSelectionMode(QAbstractItemView.ExtendedSelection)
+        self.bot_symbols.setFixedSize(QtCore.QSize(300, 100))
 
         self.list_frame = QFrame()
         self.frame_layout = QHBoxLayout()
         self.frame_layout.addWidget(self.bot_options)
-        self.frame_layout.addWidget(bot_symbols)
+        self.frame_layout.addWidget(self.bot_symbols)
         self.list_frame.setLayout(self.frame_layout)
 
         self.main_button_frame = QFrame()
@@ -105,7 +105,21 @@ class MainMenu(QWidget):
         self.setLayout(self.layout)
 
     def start_bot(self):
-        bot.runSMA(("AAPL", "MSFT"), 20, 50)
+        strats = []
+        for x in self.bot_options.selectedItems():
+            print("result", x.text())
+
+        strats = [x.text() for x in self.bot_options.selectedItems()]
+        symbols = [x.text() for x in self.bot_symbols.selectedItems()]
+
+        for strat in strats:
+            if(strat == "EMA"):
+                bot.runEMA(tuple(symbols), 30)
+            elif(strat == "SMA"):
+                bot.runSMA(tuple(symbols), 20, 50)
+            elif(strat == "Volume"):
+                bot.volumePrice(tuple(symbols), 30)
+
         self.start_button.setEnabled(False)
 
     def stop_bot(self):
