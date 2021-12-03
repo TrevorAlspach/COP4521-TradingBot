@@ -11,6 +11,7 @@ BASE_URL = "https://paper-api.alpaca.markets"
 api = alpacaAPI.REST(API_KEY, SECRET_KEY, BASE_URL, api_version='v2')
 account = api.get_account()
 QUANTITY = 5
+SYMBOLS = ["MSFT", "AAPL", "TSLA", "AMZN", "FB"]
 
 
 def runSMA(symbols, smallSMASize, largeSMASize):
@@ -38,7 +39,12 @@ def runSMA(symbols, smallSMASize, largeSMASize):
 
             except(APIError):
                 print("There is no current postion. (BUY!)")
-                # api.submit_order(symbol, )
+
+                api.submit_order(
+                    symbol=symbol,
+                    qty=str(QUANTITY),
+                    )
+                print(f"BOT {QUANTITY} {symbol}")
 
         else:
             print("LargeSMA > smallSMA")
@@ -82,6 +88,7 @@ def volumePrice(symbols, timeFrame):
                     order_class='trailing_stop',
                     trail_percent='5',
                     )
+                print(f"BOT {QUANTITY} {symbol}")
 
         else:
             print("avgVol > currentVol or price is down")
@@ -125,10 +132,12 @@ def runEMA(symbols, timeSpan):
         '''
         if float(todaysPrice) > float(emaOfPrice[length - 1]) and float(yesterdaysPrice) > float(
                 emaOfPrice[length - 2]):
-            api.submit_order(symbol, 5)
+            api.submit_order(symbol, QUANTITY)
+            print(f"BOT {QUANTITY} {symbol}")
         elif float(todaysPrice) < float(emaOfPrice[length - 1]) and float(yesterdaysPrice) < float(
                 emaOfPrice[length - 2]):
-            api.submit_order(symbol, 5, "sell")
+            api.submit_order(symbol, QUANTITY, "sell")
+            print(f"SOLD {QUANTITY} {symbol}")
         else:
             pass
         '''
@@ -154,6 +163,20 @@ def setQuantity(qt):
     global QUANTITY
     QUANTITY = qt
     print(f"New Quantity: {QUANTITY}")
+
+def addSymbol(symbol):
+    try:
+        asset = api.get_asset(symbol)
+        if not asset.tradable:
+            print(f"ERROR: {symbol} is not tradeable on Alpaca")
+        else:
+            global SYMBOLS
+            SYMBOLS.append(symbol)
+            print(f"Added {symbol} to list of symbols")
+
+    except(APIError):
+        print(f"ERROR: {symbol} is invalid")
+
 
 def getCurrentBalance():
     account = api.get_account()

@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets,QtCharts
 from PySide6.QtWidgets import *
 from PySide6 import QtCore
-from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, setQuantity, getCurrentBalance
+from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, addSymbol, SYMBOLS, getCurrentBalance
 import db.dbFunctions as db
 import datetime
 
@@ -95,7 +95,9 @@ class MainMenu(QWidget):
         self.symbols_layout = QVBoxLayout()
         self.symbols_layout.addStretch()
         self.bot_symbols = QListWidget()
-        self.bot_symbols.addItems(["MSFT", "AAPL", "TSLA"])
+
+        sym = SYMBOLS
+        self.bot_symbols.addItems(sym)
         self.bot_symbols.setSelectionMode(QAbstractItemView.ExtendedSelection)
         self.bot_symbols.setFixedSize(QtCore.QSize(300, 100))
         self.symbols_label = QLabel(text="Symbols to Trade")
@@ -143,9 +145,13 @@ class MainMenu(QWidget):
         self.quantity_button = QPushButton("Set Quantity")
         self.quantity_button.clicked.connect(self.set_quantity)
 
+        self.add_symbol_button = QPushButton("Add a Symbol")
+        self.add_symbol_button.clicked.connect(self.add_symbol)
+
         self.buttonLayout.addWidget(self.start_button)
         self.buttonLayout.addWidget(self.stop_button)
         self.buttonLayout.addWidget(self.quantity_button)
+        self.buttonLayout.addWidget(self.add_symbol_button)
         self.main_button_frame.setLayout(self.buttonLayout)
 
         self.layout.addWidget(self.main_label)
@@ -170,6 +176,13 @@ class MainMenu(QWidget):
         else:
             setQuantity(5)
 
+    def add_symbol(self):
+        text, ok = QInputDialog.getText(self, "Add Symbol Dialog", "Enter Symbol")
+        if ok:
+            addSymbol(text)
+            self.bot_symbols.clear()
+            self.bot_symbols.addItems(SYMBOLS)
+
     def start_bot(self):
         for x in self.bot_options.selectedItems():
             print("result", x.text())
@@ -180,7 +193,7 @@ class MainMenu(QWidget):
         except:
             print("No options selected")
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
-
+        
         self.timer.start(21600000)
         self.start_button.setEnabled(False)
         for button in self.checkboxes.buttons():
