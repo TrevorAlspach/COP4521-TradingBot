@@ -28,3 +28,14 @@ def stopBotRun(end_date, end_balance):
         profit = float(end_balance) - float(start_balance)
         db.execute("UPDATE BotHistory SET (EndDate, EndBalance, Profit, CurrentBot) = (?,?,?,?) WHERE CurrentBot = 1", (end_date, end_balance, profit, 0))
 
+def getAnalysisDates():
+    with sqlite3.connect('botData.db') as db:
+        curr = db.cursor()
+        Dates = curr.execute('SELECT Date FROM Analysis LIMIT 0, 30').fetchall()
+        return Dates
+
+def getAnaltsisValues():
+    with sqlite3.connect('botData.db') as db:
+        curr = db.cursor()
+        Values = curr.execute('SELECT Price FROM Analysis LIMIT 0, 30').fetchall()
+        return Values
