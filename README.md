@@ -12,11 +12,10 @@ Within the COP4521-TradingBot Directory
 * $python3 app.py
 
 ### Strategies Implemented
-| Simple Moving Average  |  Exponential Moving Average | Volume Trading |
-|:-:|:-:|:-:|
-| 5/20 Day | 12 Day  | 12 Day |
-| 20/50 Day |  26 Day | 26 Day |
-| 50/200 Day | 50 Day | 50 Day |
+* Simple Moving Average
+* Exponential Moving Average 
+* Volume Trading
+
 
 ### GUI
 When starting the application, you will be brought to the home dashboard. Here, there will be a listview for both the strategy you would like to run as well as which symbols you would like to trade (In order to select several symbols, use ctrl + click). You then start the bot by selecting START BOT. You will then be asked to input the time span you'd like to use for the strategy you selected. At this point the bot will run in the background, and can only be stopped by selecting STOP BOT. The data of 
