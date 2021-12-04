@@ -1,7 +1,7 @@
 from PySide6 import QtWidgets,QtCharts
 from PySide6.QtWidgets import *
 from PySide6 import QtCore
-from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, addSymbol, SYMBOLS, getCurrentBalance
+from TradingBot.Bot import runEMA, runSMA, volumePrice, setQuantity, addSymbol, SYMBOLS, getCurrentBalance, getPortfolioHistory
 import db.dbFunctions as db
 import datetime
 
@@ -29,14 +29,52 @@ class Window(QMainWindow):
         button2.clicked.connect(self.view_graph)
         button3 = QPushButton("View Bot History")
         button3.clicked.connect(self.view_bot_history)
+        button4 = QPushButton("View Bot Profit/Loss")
+        button4.clicked.connect(self.view_bot_pl)
         buttonLayout.addWidget(button1)
         buttonLayout.addWidget(button2)
         buttonLayout.addWidget(button3)
+        buttonLayout.addWidget(button4)
         frame = QFrame()
         frame.setLayout(buttonLayout)
         frame.setFrameStyle(QFrame.Raised | QFrame.Panel)
 
         return frame
+
+    def view_bot_pl(self):
+        self.setCentralWidget(self.setupMainWidget(self.generate_pl_graph()))
+
+    def generate_pl_graph(self, points=None):
+        portfolio_history = getPortfolioHistory()
+
+        self.pl_chart = QtCharts.QChart()
+        self.series = QtCharts.QLineSeries()
+
+        count = len(portfolio_history.equity)-1
+        for x in portfolio_history.equity:
+            self.series.append(count, x)
+            count-=1
+
+        self.pl_chart.addSeries(self.series)
+        self.pl_axis_x = QtCharts.QValueAxis()
+        self.pl_axis_x.setTickCount(len(portfolio_history.equity))
+        self.pl_axis_x.setReverse(True)
+        self.pl_axis_x.setTitleText("Date")
+        self.pl_chart.addAxis(self.pl_axis_x, QtCore.Qt.AlignBottom)
+        self.series.attachAxis(self.pl_axis_x)
+
+        self.pl_axis_y = QtCharts.QValueAxis()
+        self.pl_axis_y.setTitleText("Value (in $)")
+        self.pl_axis_y.setTickCount(len(portfolio_history.equity))
+        self.pl_chart.addAxis(self.pl_axis_y, QtCore.Qt.AlignLeft)
+        self.series.attachAxis(self.pl_axis_y)
+        #self.pl_chart.addAxis(xAxis, 0)
+        #self.pl_chart.addAxis(yAxis, 1)
+        #self.pl_chart.createDefaultAxes()
+        self.pl_chart.setTitle("Portfolio Value (last 30 days)")
+        chartView = QtCharts.QChartView(self.pl_chart)
+
+        return chartView
 
     def view_main_menu(self):
         self.setCentralWidget(self.setupMainWidget(MainMenu()))
@@ -108,24 +146,6 @@ class MainMenu(QWidget):
         self.symbols_layout.addStretch()
         self.symbols_frame.setLayout(self.symbols_layout)
 
-
-        self.checkbox_frame = QFrame()
-        self.checkbox_label = QLabel(text= "Time Span (Days)")
-        self.checkboxes = QButtonGroup()
-        self.checkbox_layout = QVBoxLayout()
-        self.checkbox_layout.setAlignment(QtCore.Qt.AlignHCenter)
-        self.check_1 = QRadioButton("SMA: 5, 20   EMA/Volume: 12")
-        self.check_2 = QRadioButton("SMA: 20, 50   EMA/Volume: 26")
-        self.check_3 = QRadioButton("SMA: 50, 200  EMA/Volume: 50")
-        self.checkboxes.addButton(self.check_1)
-        self.checkboxes.addButton(self.check_2)
-        self.checkboxes.addButton(self.check_3)
-        self.checkbox_layout.addWidget(self.checkbox_label)
-        self.checkbox_layout.addWidget(self.check_1)
-        self.checkbox_layout.addWidget(self.check_2)
-        self.checkbox_layout.addWidget(self.check_3)
-        self.checkbox_frame.setLayout(self.checkbox_layout)
-
         self.list_frame = QFrame()
         self.frame_layout = QHBoxLayout()
         self.frame_layout.addStretch()
@@ -158,7 +178,6 @@ class MainMenu(QWidget):
 
         self.layout.addWidget(self.main_label)
         self.layout.addWidget(self.list_frame)
-        self.layout.addWidget(self.checkbox_frame)
         self.layout.addWidget(self.main_button_frame)
         self.layout.addStretch()
         self.setLayout(self.layout)
@@ -166,8 +185,6 @@ class MainMenu(QWidget):
     def stop_bot(self):
         self.timer.stop()
         self.start_button.setEnabled(True)
-        for button in self.checkboxes.buttons():
-            button.setEnabled(True)
 
         db.stopBotRun(datetime.datetime.now(), getCurrentBalance())
 
@@ -181,53 +198,53 @@ class MainMenu(QWidget):
     def add_symbol(self):
         text, ok = QInputDialog.getText(self, "Add Symbol Dialog", "Enter Symbol")
         if ok:
-            addSymbol(text)
             self.bot_symbols.clear()
             self.bot_symbols.addItems(SYMBOLS)
 
     def start_bot(self):
-        for x in self.bot_options.selectedItems():
-            print("result", x.text())
-
-        self.timeframe = self.checkboxes.checkedButton()
+        self.timeframe = 10
+        self.timeframe1 = 30
         try:
             self.strat = self.bot_options.selectedItems()[-1].text()
+            if(self.strat == "SMA"):
+                small, ok = QInputDialog.getInt(self, "Small SMA Dialog", "Enter small SMA timeframe")
+                large, ok1 = QInputDialog.getInt(self, "Large SMA Dialog", "Enter large SMA timeframe")
+                if ok and ok1 and small<large:
+                    self.timeframe = small
+                    self.timeframe1 = large
+                else:
+                    self.timeframe = 10
+                    self.timeframe = 30
+                    print("ERROR: Large timeframe not larger than small timeframe. Setting default parameters.")
+
+            else:
+                num, ok = QInputDialog.getInt(self, "Timeframe Dialog", "Enter Timeframe")
+                if ok:
+                    self.timeframe = num
+                else:
+                    self.timeframe = 30
+                    print("ERROR: Timeframe invalid. Using default parameters.")
+
         except:
             print("No options selected")
+
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
 
-        self.timer.start(21600000) # change this for testing
-        
+        self.timer.start(1000) # change this for testing, original = 21600000
+
         self.start_button.setEnabled(False)
-        for button in self.checkboxes.buttons():
-            button.setEnabled(False)
 
         db.startBotRun(self.strat, datetime.datetime.now(), getCurrentBalance())
 
     def whichStrategy(self):
             if(self.strat == "EMA"):
-                if self.timeframe == self.check_1:
-                    runEMA(tuple(self.symbols), 12)
-                if self.timeframe == self.check_2:
-                    runEMA(tuple(self.symbols), 26)
-                elif self.timeframe == self.check_3:
-                    runEMA(tuple(self.symbols), 50)
+                runEMA(tuple(self.symbols), self.timeframe)
 
             elif(self.strat == "SMA"):
-                if self.timeframe == self.check_1:
-                    runSMA(tuple(self.symbols), 5, 20)
-                if self.timeframe == self.check_2:
-                    runSMA(tuple(self.symbols), 20, 50)
-                elif self.timeframe == self.check_3:
-                    runSMA(tuple(self.symbols), 50, 200)
+                runSMA(tuple(self.symbols), self.timeframe, self.timeframe1)
 
             elif(self.strat == "Volume"):
-                if self.timeframe == self.check_1:
-                    volumePrice(tuple(self.symbols), 12)
-                if self.timeframe == self.check_2:
-                    volumePrice(tuple(self.symbols), 26)
-                elif self.timeframe == self.check_3:
-                    volumePrice(tuple(self.symbols), 50)
+                volumePrice(tuple(self.symbols), self.timeframe)
 
 
 class BotHistory(QWidget):
@@ -259,10 +276,6 @@ class BotHistory(QWidget):
         self.bot_history = db.getBotHistory()
         self.item_titles = []
         for item in self.bot_history:
-
-            #testing
-            print(item)
-
             self.item_titles.append("|   STRATEGY:     " + item[0] + "   |   START:     " + item[1] + "  |   END:     " + item[2] + "  |   PROFIT:    $" + str(item[5]) + "  |  ")
 
         return self.item_titles
