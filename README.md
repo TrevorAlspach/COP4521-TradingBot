@@ -7,7 +7,7 @@ A python application that uses the Alpaca Data API and Orders API in order to tr
 
 **TO RUN THE APP** <br />
 Within the COP4521-TradingBot Directory
-* $source /venv/Scripts/activate
+* $source venv/bin/activate
 * $pip install -r Utility/requirements.txt
 * $python3 app.py
 
