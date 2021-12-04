@@ -198,6 +198,7 @@ class MainMenu(QWidget):
     def add_symbol(self):
         text, ok = QInputDialog.getText(self, "Add Symbol Dialog", "Enter Symbol")
         if ok:
+            addSymbol(text)
             self.bot_symbols.clear()
             self.bot_symbols.addItems(SYMBOLS)
 
