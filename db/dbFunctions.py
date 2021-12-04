@@ -30,9 +30,12 @@ def startBotRun(strategy, start_date, start_balance):
 
 def stopBotRun(end_date, end_balance):
     with sqlite3.connect('botData.db') as db:
-        start_balance = db.execute("SELECT StartBalance FROM BotHistory WHERE CurrentBot = 1").fetchone()[0]
-        profit = float(end_balance) - float(start_balance)
-        db.execute("UPDATE BotHistory SET (EndDate, EndBalance, Profit, CurrentBot) = (?,?,?,?) WHERE CurrentBot = 1", (end_date, end_balance, profit, 0))
+        try:
+            start_balance = db.execute("SELECT StartBalance FROM BotHistory WHERE CurrentBot = 1").fetchone()[0]
+            profit = float(end_balance) - float(start_balance)
+            db.execute("UPDATE BotHistory SET (EndDate, EndBalance, Profit, CurrentBot) = (?,?,?,?) WHERE CurrentBot = 1", (end_date, end_balance, profit, 0))
+        except:
+            print("An Error occured, no Current Bot Running")
 
 def getAnalysisDates():
     with sqlite3.connect('botData.db') as db:
