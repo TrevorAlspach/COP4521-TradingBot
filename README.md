@@ -22,7 +22,7 @@ Within the COP4521-TradingBot Directory
 | 50/200 Day | 50 Day | 50 Day |
 
 ### GUI
-When starting the application, you will be brought to the home dashboard. Here, there will be a listview for both the strategy you would like to run as well as which symbols you would like to trade (In order to select several symbols, use ctrl + click). Below that are three radio buttons pertaining to the time span you'd like to run, of which you can select one. You then start the bot by selecting START BOT. At this point the bot will run in the background, and can only be stopped by selecting STOP BOT. The data of 
+When starting the application, you will be brought to the home dashboard. Here, there will be a listview for both the strategy you would like to run as well as which symbols you would like to trade (In order to select several symbols, use ctrl + click). You then start the bot by selecting START BOT. You will then be asked to input the time span you'd like to use for the strategy you selected. At this point the bot will run in the background, and can only be stopped by selecting STOP BOT. The data of 
 your previous iteration will then be stored for you to view.
 
 - - - -
