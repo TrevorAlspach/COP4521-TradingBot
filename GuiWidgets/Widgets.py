@@ -230,7 +230,7 @@ class MainMenu(QWidget):
 
         self.symbols = [x.text() for x in self.bot_symbols.selectedItems()]
 
-        self.timer.start(1000) # change this for testing, original = 21600000
+        self.timer.start(21600000) # change this for testing, original = 21600000
 
         self.start_button.setEnabled(False)
 

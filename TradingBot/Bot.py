@@ -51,7 +51,17 @@ def runSMA(symbols, smallSMASize, largeSMASize):
                 print(f"BOT {QUANTITY} {symbol}")
 
         else:
-            print("LargeSMA > smallSMA")
+            try:
+                position = api.get_position(symbol)
+                api.submit_order(
+                    symbol=symbol,
+                    type="market",
+                    side="sell",
+                    qty=position.qty
+                )
+                print(f"SOLD {position.qty} {symbol}")
+            except(APIError):
+                pass
 
     with sql.connect("botData.db") as con:
         cur = con.cursor()
@@ -64,7 +74,7 @@ def runSMA(symbols, smallSMASize, largeSMASize):
 
 
 def volumePrice(symbols, timeFrame):
-    print(f"Running Volume on {symbols} with size timeFrame")
+    print(f"Running Volume on {symbols} with size {timeFrame}")
     if account.status != "ACTIVE":
         logging.error("Alpaca Account is not able to trade")
         return False
@@ -86,7 +96,7 @@ def volumePrice(symbols, timeFrame):
                 api.get_position(symbol)
 
             except(APIError):
-                print("There is no current position. (BUY!)")
+                # print("There is no current position. (BUY!)")
 
                 api.submit_order(
                     symbol=symbol,
@@ -100,7 +110,8 @@ def volumePrice(symbols, timeFrame):
                 print(f"BOT {QUANTITY} {symbol}")
 
         else:
-            print("avgVol > currentVol or price is down")
+            pass
+            #print("avgVol > currentVol or price is down")
 
         with sql.connect("botData.db") as con:
             cur = con.cursor()
@@ -137,14 +148,29 @@ def runEMA(symbols, timeSpan):
 
         emaOfPrice = emaCalculation(priceList, length)  # store ema prices inside of a list
 
-        if float(todaysPrice) > float(emaOfPrice[length - 1]) and float(yesterdaysPrice) > float(
-                emaOfPrice[length - 2]):
-            #api.submit_order(symbol, QUANTITY)
-            print(f"BOT {QUANTITY} {symbol}")
-        elif float(todaysPrice) < float(emaOfPrice[length - 1]) and float(yesterdaysPrice) < float(
-                emaOfPrice[length - 2]):
-            #api.submit_order(symbol, QUANTITY, "sell")
-            print(f"SOLD {QUANTITY} {symbol}")
+        if float(todaysPrice) > float(emaOfPrice[length - 1]) and float(yesterdaysPrice) > float(emaOfPrice[length - 2]):
+            try:
+                api.get_position(symbol)
+            except:
+                api.submit_order(
+                    symbol=symbol,
+                    side='buy',
+                    type='market',
+                    qty=str(QUANTITY),
+                    time_in_force='day',
+                    )
+                print(f"BOT {QUANTITY} {symbol}")
+
+        elif float(todaysPrice) < float(emaOfPrice[length - 1]) and float(yesterdaysPrice) < float(emaOfPrice[length - 2]):
+            try:
+                position = api.get_position(symbol)
+                api.submit_order(
+                    symbol=symbol,
+                    qty=position.qty
+                    )
+                print(f"SOLD {QUANTITY} {symbol}")
+            except(APIError):
+                pass
         else:
             pass
 
