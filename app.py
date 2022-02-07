@@ -4,6 +4,9 @@ import sys
 import TradingBot.Bot as Bot
 import db.dbFunctions as db
 
+def hello():
+    print('hello')
+
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
